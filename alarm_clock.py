@@ -27,13 +27,18 @@ class Dimmer(object):
 		else:
 			return value
 
+class Lights():
+	pass
+
+def setup_lights():
+	pass
 
 def main():
-
+	lights = setup_lights()
 	dimmer = Dimmer()
 	try:
 		while True:
-			pass
+			lights.set_brightness(dimmer.get_value())
 
 	except:
 		cleanup()
