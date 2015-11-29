@@ -5,7 +5,7 @@ from lib.neopixel import Adafruit_NeoPixel
 import settings
 
 class Dimmer(object):
-	MAX = 100
+	MAX = 255
 	MIN = 0
 
 	def __init__(self, time_period=1800, start_time=datetime.datetime.utcnow()):
@@ -15,9 +15,17 @@ class Dimmer(object):
 		self.time_period = time_period
 		self.start_time = start_time
 
-	def get_value(self, now=datetime.datetime.utcnow()):
+	def get_value(self, now=None):
 		# return value from min to max with dimmer value
-		value = (self.MAX - self.MIN)*(now - self.start_time).seconds / self.time_period
+		if now == None:
+			now = datetime.datetime.utcnow()
+		print "now: %r" % now
+		print "start_time: %r" % self.start_time
+		print "time_diff %r" %((now-self.start_time).seconds)
+		print "top: %r" %  ((self.MAX - self.MIN)*(now - self.start_time).seconds)
+		value = int((self.MAX - self.MIN)*(now - self.start_time).seconds / float(self.time_period))
+		print value
+		
 		return self._limit_value(value)
 
 	def _limit_value(self, value):
@@ -38,26 +46,24 @@ class Lights(Adafruit_NeoPixel):
 		super(Lights, self).__init__(n_lights, control_pin)
 		self.begin()
 		for light in range(n_lights):
-			self.setPixelColorRGB(light, 200, 200, 200)
+			self.setPixelColorRGB(light, setting.COLOR[0], settings.COLOR[1], settings.COLOR[2])
 		self.setBrightness(0)
 		self.show()
 
 
 def main():
 	lights = Lights()
-	dimmer = Dimmer(time_period=10)
-	try:
-		while True:
-			lights.setBrightness(dimmer.get_value())
-			lights.show()
-	except:
-		cleanup()
+	dimmer = Dimmer(time_period=100)
+	while True:
+		print dimmer.get_value()
+		lights.setBrightness(dimmer.get_value())
+		lights.show()
 	
 def cleanup():
 	"""
 	cleanup and exit
 	"""
-	pass
+	print "exiting"
 
 def initialize():
 	"""

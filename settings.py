@@ -1,4 +1,4 @@
 N_LIGHTS = 10
-COLOR = 444444
+COLOR = frozenset([253, 215 0])
 CONTROL_PIN = 18
 
