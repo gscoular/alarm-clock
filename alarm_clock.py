@@ -1,5 +1,9 @@
 import datetime
 
+from lib.neopixel imoport Adafruit_NeoPixel
+
+import settings
+
 class Dimmer(object):
 	MAX = 100
 	MIN = 0
@@ -27,19 +31,22 @@ class Dimmer(object):
 		else:
 			return value
 
-class Lights():
-	pass
+class Lights(Adafruit_NeoPixel):
+	def __init__(self, n_lights=settings.N_LIGHTS, control_pin=settings.CONTROL_PIN):
+		super(Lights, self).setUp(n_lights, control_pin)
+		self.begin()
+		for light in range(n_lights):
+			self.setPixelColorRGB(light, 100, 100, 100)
+		self.setBrightness(255)
+		self.show()
 
-def setup_lights():
-	pass
 
 def main():
-	lights = setup_lights()
+	lights = Lights()
 	dimmer = Dimmer()
 	try:
 		while True:
-			lights.set_brightness(dimmer.get_value())
-
+			pass
 	except:
 		cleanup()
 	
