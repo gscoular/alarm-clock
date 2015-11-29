@@ -25,7 +25,9 @@ class Dimmer(object):
 		return value within MIN, MAX range
 		"""
 		if value > self.MAX:
-			return self.MAX
+			#reset
+			self.start_time = datetime.datetime.utcnow()
+			return self.MAX:wq
 		elif value < self.MIN:
 			return self.MIN
 		else:
@@ -37,16 +39,17 @@ class Lights(Adafruit_NeoPixel):
 		self.begin()
 		for light in range(n_lights):
 			self.setPixelColorRGB(light, 200, 200, 200)
-		self.setBrightness(255)
+		self.setBrightness(0)
 		self.show()
 
 
 def main():
 	lights = Lights()
-	dimmer = Dimmer()
+	dimmer = Dimmer(time_period=10)
 	try:
 		while True:
-			pass
+			lights.setBrightness(dimmer.get_value())
+			lights.show()
 	except:
 		cleanup()
 	
