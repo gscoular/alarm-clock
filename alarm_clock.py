@@ -1,6 +1,6 @@
 import datetime
 
-from lib.neopixel imoport Adafruit_NeoPixel
+from lib.neopixel import Adafruit_NeoPixel
 
 import settings
 
@@ -33,10 +33,10 @@ class Dimmer(object):
 
 class Lights(Adafruit_NeoPixel):
 	def __init__(self, n_lights=settings.N_LIGHTS, control_pin=settings.CONTROL_PIN):
-		super(Lights, self).setUp(n_lights, control_pin)
+		super(Lights, self).__init__(n_lights, control_pin)
 		self.begin()
 		for light in range(n_lights):
-			self.setPixelColorRGB(light, 100, 100, 100)
+			self.setPixelColorRGB(light, 200, 200, 200)
 		self.setBrightness(255)
 		self.show()
 
