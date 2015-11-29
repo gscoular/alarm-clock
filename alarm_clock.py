@@ -19,10 +19,7 @@ class Dimmer(object):
 		# return value from min to max with dimmer value
 		if now == None:
 			now = datetime.datetime.utcnow()
-		print "now: %r" % now
-		print "start_time: %r" % self.start_time
 		print "time_diff %r" %((now-self.start_time).seconds)
-		print "top: %r" %  ((self.MAX - self.MIN)*(now - self.start_time).seconds)
 		value = int((self.MAX - self.MIN)*(now - self.start_time).seconds / float(self.time_period))
 		print value
 		
@@ -46,7 +43,7 @@ class Lights(Adafruit_NeoPixel):
 		super(Lights, self).__init__(n_lights, control_pin)
 		self.begin()
 		for light in range(n_lights):
-			self.setPixelColorRGB(light, setting.COLOR[0], settings.COLOR[1], settings.COLOR[2])
+			self.setPixelColorRGB(light, settings.COLOR[0], settings.COLOR[1], settings.COLOR[2])
 		self.setBrightness(0)
 		self.show()
 
@@ -54,21 +51,21 @@ class Lights(Adafruit_NeoPixel):
 def main():
 	lights = Lights()
 	dimmer = Dimmer(time_period=100)
-	while True:
-		print dimmer.get_value()
-		lights.setBrightness(dimmer.get_value())
-		lights.show()
-	
-def cleanup():
+	try:
+		while True:
+			print dimmer.get_value()
+			lights.setBrightness(dimmer.get_value())
+			lights.show()
+	except KeyboardInterrupt:
+		print "keyboard interrupt: exiting"
+		cleanup(lights)	
+def cleanup(lights):
 	"""
 	cleanup and exit
 	"""
-	print "exiting"
-
-def initialize():
-	"""
-	"""
-	pass
+	lights.setBrightness(0)
+	lights.show()
+	
 
 if __name__ == '__main__':
 	main()
