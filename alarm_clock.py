@@ -27,7 +27,7 @@ class Dimmer(object):
 		if value > self.MAX:
 			#reset
 			self.start_time = datetime.datetime.utcnow()
-			return self.MAX:wq
+			return self.MAX
 		elif value < self.MIN:
 			return self.MIN
 		else:
