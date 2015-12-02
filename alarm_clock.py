@@ -1,6 +1,7 @@
 import datetime
 
 from lib.neopixel import Adafruit_NeoPixel
+from RPi import GPIO
 
 import settings
 
@@ -47,25 +48,37 @@ class Lights(Adafruit_NeoPixel):
 		self.setBrightness(0)
 		self.show()
 
+	def cleanup(self):
+		""" Turn off lights """
+		lights.setBrightness(0)
+		lights.show()
+
+def setup_reset():
+	GPIO.setup(settings.RESET_PIN, GPIO.IN)
+
+
+class ResetPinException(Exception):
+	pass
+
+def check_for_reset():
+	if GPIO.input(settings.RESET_PIN):
+		raise ResetPinException()
 
 def main():
+	setup_reset()
 	lights = Lights()
 	dimmer = Dimmer(time_period=100)
 	try:
 		while True:
-			print dimmer.get_value()
 			lights.setBrightness(dimmer.get_value())
 			lights.show()
+			check_for_reset()
+	except ResetPinException:
+		print "Resetting"
+		lights.cleanup()
 	except KeyboardInterrupt:
 		print "keyboard interrupt: exiting"
-		cleanup(lights)	
-def cleanup(lights):
-	"""
-	cleanup and exit
-	"""
-	lights.setBrightness(0)
-	lights.show()
-	
+		lights.cleanup()
 
 if __name__ == '__main__':
 	main()
