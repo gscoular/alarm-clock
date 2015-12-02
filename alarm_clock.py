@@ -1,7 +1,11 @@
 import datetime
+import logging
 
 from lib.neopixel import Adafruit_NeoPixel
-from RPi import GPIO
+try:
+	from RPi import GPIO
+except:
+	logging.info("can't import RPi.GPIO")
 
 import settings
 

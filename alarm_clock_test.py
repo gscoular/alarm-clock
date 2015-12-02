@@ -2,14 +2,26 @@ import unittest
 import mock
 import datetime
 
-from alarm_clock import Dimmer
+from alarm_clock import Dimmer, Lights
 
-class DimmerTests(unittest.TestCase):
+class MockNeopixel(object):
+	pass
+	
+
+class RpiTestCase(unittest.TestCase):
 	def setUp(self):
-		super(DimmerTests, self).setUp()
+		self.MOCK_NEOPIXEL = mock.patch('lib.neopixel.Adafruit_NeoPixel', return_value = MockNeopixel())
+		self.MOCK_NEOPIXEL.start()
+		self.MOCK_WS = mock.patch('lib._rpi_ws281x')
+		self.MOCK_WS.start()
+
+	def tearDown(self):
+		self.MOCK_NEOPIXEL.stop()
+		self.MOCK_WS.stop()
 
 
-class DimmerLimitValuesTests(unittest.TestCase):
+class DimmerLimitValuesTests(RpiTestCase):
+
 	def test_limit_values_returns_max_if_value_is_greater_than_max(self):
 		dimmer = Dimmer()
 		value = dimmer._limit_value(dimmer.MAX+1)
@@ -25,7 +37,7 @@ class DimmerLimitValuesTests(unittest.TestCase):
 		value = dimmer._limit_value(dimmer.MIN + 1)
 		self.assertEqual(dimmer.MIN+1, value)
 
-class DimmerGetValueTests(unittest.TestCase):
+class DimmerGetValueTests(RpiTestCase):
 	def setUp(self):
 		super(DimmerGetValueTests, self).setUp()
 		self.start_time = datetime.datetime.utcnow()
@@ -45,3 +57,10 @@ class DimmerGetValueTests(unittest.TestCase):
 	def test_get_value_calls_limit_value_with_half_max_if_half_time_period_added_to_start_time(self, mock_limit):
 		self.dimmer.get_value(self.start_time+datetime.timedelta(seconds=self.dimmer.time_period/2))
 		mock_limit.assert_called_once_with(self.dimmer.MAX/2)
+
+class LightsTests(RpiTestCase):
+	def setUp(self):
+		super(LightsTests, self).setUp()
+
+	def test_init_calls_set_pixel_brightness_for_each_light(self):
+		light = Lights()
