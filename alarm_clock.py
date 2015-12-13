@@ -52,8 +52,8 @@ class Lights(Adafruit_NeoPixel):
 
 	def cleanup(self):
 		""" Turn off lights """
-		lights.setBrightness(0)
-		lights.show()
+		self.setBrightness(0)
+		self.show()
 
 def setup_reset():
 	GPIO.setmode(GPIO.BOARD)
