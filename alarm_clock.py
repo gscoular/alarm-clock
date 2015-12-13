@@ -56,6 +56,7 @@ class Lights(Adafruit_NeoPixel):
 		lights.show()
 
 def setup_reset():
+	GPIO.setmode(GPIO.BOARD)
 	GPIO.setup(settings.RESET_PIN, GPIO.IN)
 
 
