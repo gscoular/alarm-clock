@@ -19,9 +19,7 @@ class Dimmer(object):
 		# return value from min to max with dimmer value
 		if now == None:
 			now = datetime.datetime.utcnow()
-		print "time_diff %r" %((now-self.start_time).seconds)
 		value = int((self.MAX - self.MIN)*(now - self.start_time).seconds / float(self.time_period))
-		print value
 		
 		return self._limit_value(value)
 
