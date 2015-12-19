@@ -20,6 +20,11 @@ class Dimmer(object):
 		self.time_period = time_period
 		self.start_time = start_time
 
+	def is_max_value(self):
+		if self.get_value() == self.MAX:
+			return True
+		return False
+
 	def get_value(self, now=None):
 		# return value from min to max with dimmer value
 		if now == None:
@@ -70,18 +75,21 @@ def check_for_reset():
 def main():
 	setup_reset()
 	lights = Lights()
-	dimmer = Dimmer(time_period=100)
+	dimmer = Dimmer(time_period=1800)
 	try:
-		while True:
+		while lights.is_max_value() == False:
 			lights.setBrightness(dimmer.get_value())
 			lights.show()
 			check_for_reset()
+			
 	except ResetPinException:
 		print "Resetting"
 		lights.cleanup()
 	except KeyboardInterrupt:
 		print "keyboard interrupt: exiting"
 		lights.cleanup()
+	lights.cleanup()
+	
 
 if __name__ == '__main__':
 	main()
