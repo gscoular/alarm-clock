@@ -77,7 +77,7 @@ def main():
 	lights = Lights()
 	dimmer = Dimmer(time_period=1800)
 	try:
-		while lights.is_max_value() == False:
+		while dimmer.is_max_value() == False:
 			lights.setBrightness(dimmer.get_value())
 			lights.show()
 			check_for_reset()
