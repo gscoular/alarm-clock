@@ -13,7 +13,7 @@ class Dimmer(object):
 	MAX = 255
 	MIN = 0
 
-	def __init__(self, time_period=1800, start_time=datetime.datetime.utcnow()):
+	def __init__(self, time_period=1800, start_time=datetime.datetime.now().time()):
 		"""
 		set starting params
 		"""
@@ -28,8 +28,9 @@ class Dimmer(object):
 	def get_value(self, now=None):
 		# return value from min to max with dimmer value
 		if now == None:
-			now = datetime.datetime.utcnow()
-		value = int((self.MAX - self.MIN)*(now - self.start_time).seconds / float(self.time_period))
+			now = datetime.datetime.now()
+			start_time = datetime.datetime.combine(now.date(), self.start_time)
+		value = int((self.MAX - self.MIN)*(now - start_time).seconds / float(self.time_period))
 		
 		return self._limit_value(value)
 
@@ -39,7 +40,7 @@ class Dimmer(object):
 		"""
 		if value > self.MAX:
 			#reset
-			self.start_time = datetime.datetime.utcnow()
+			self.start_time = datetime.datetime.now().time()
 			return self.MAX
 		elif value < self.MIN:
 			return self.MIN
@@ -72,19 +73,29 @@ def check_for_reset():
 	if GPIO.input(settings.RESET_PIN):
 		raise ResetPinException()
 
+def brighten_sequence(lights, dimmer):
+	while dimmer.is_max_value() == False:
+		lights.setBrightness(dimmer.get_value())
+		lights.show()
+		check_for_reset()
+
+def main_loop(lights, dimmer):
+	while True:
+		if datetime.datetime.now().time() < dimmer.start_time:
+			pass
+		else:
+			try:
+				brighten_sequence(lights, dimmer)
+			except ResetPinException:
+				print "Resetting"
+				lights.cleanup()
+			
 def main():
 	setup_reset()
 	lights = Lights()
-	dimmer = Dimmer(time_period=1800)
+	dimmer = Dimmer(time_period=1800, start_time=datetime.time(**settings.START_TIME))
 	try:
-		while dimmer.is_max_value() == False:
-			lights.setBrightness(dimmer.get_value())
-			lights.show()
-			check_for_reset()
-			
-	except ResetPinException:
-		print "Resetting"
-		lights.cleanup()
+		main_loop(lights, dimmer)
 	except KeyboardInterrupt:
 		print "keyboard interrupt: exiting"
 		lights.cleanup()
