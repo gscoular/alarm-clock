@@ -79,12 +79,13 @@ def brighten_sequence(lights, dimmer):
 		lights.show()
 		check_for_reset()
 
-def main_loop(lights, dimmer):
+def main_loop(lights):
 	while True:
-		if datetime.datetime.now().time() < dimmer.start_time:
+		if datetime.datetime.now().time() < datetime.time(**settings.START_TIME) and datetime.datetime.now().time() > (datetime.datetime.now()+datetime.timedelta(seconds=1800)).time():
 			pass
 		else:
 			try:
+				dimmer = Dimmer(time_period=1800, start_time=datetime.time(**settings.START_TIME))
 				brighten_sequence(lights, dimmer)
 			except ResetPinException:
 				print "Resetting"
@@ -93,9 +94,8 @@ def main_loop(lights, dimmer):
 def main():
 	setup_reset()
 	lights = Lights()
-	dimmer = Dimmer(time_period=1800, start_time=datetime.time(**settings.START_TIME))
 	try:
-		main_loop(lights, dimmer)
+		main_loop(lights)
 	except KeyboardInterrupt:
 		print "keyboard interrupt: exiting"
 		lights.cleanup()
