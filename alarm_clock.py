@@ -9,6 +9,11 @@ except:
 
 import settings
 
+logging.basicConfig(filename='output.log',level=logging.DEBUG)
+logging.debug('This message should go to the log file')
+logging.info('So should this')
+logging.warning('And this, too')
+logging.info('booting up: time is %r', datetime.datetime.now())
 class Dimmer(object):
 	MAX = 255
 	MIN = 0
@@ -92,6 +97,7 @@ def main_loop(lights):
 				lights.cleanup()
 			
 def main():
+	print 'booting up: %r' %datetime.datetime.now()
 	setup_reset()
 	lights = Lights()
 	try:
