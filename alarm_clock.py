@@ -94,7 +94,7 @@ def main_loop(lights):
 				brighten_sequence(lights, dimmer)
 			except ResetPinException:
 				print "Resetting"
-				lights.cleanup()
+			lights.cleanup()
 			
 def main():
 	print 'booting up: %r' %datetime.datetime.now()
