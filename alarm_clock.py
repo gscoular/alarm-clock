@@ -85,23 +85,31 @@ def brighten_sequence(lights, dimmer):
 		check_for_reset()
 
 def bright_lights_sequence(lights, time_period=1800):
+	startdate = datetime.datetime.now()
 	lights.setBrightness(lights.MAX_BRIGHTNESS)
 	lights.show()
-	while datetime.datetime.now().time() < (datetime.datetime.now()+datetime.timedelta(seconds=time_period)).time():
+	while datetime.datetime.now().time() < (startdate+datetime.timedelta(seconds=time_period)).time():
 		check_for_reset()
 
 def main_loop(lights):
 	while True:
-		if datetime.datetime.now().time() < datetime.time(**settings.START_TIME) and datetime.datetime.now().time() > (datetime.datetime.now()+datetime.timedelta(seconds=1800)).time():
-			pass
-		else:
+		current_date = datetime.datetime.now()
+		start_date = datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(**settings.START_TIME))
+		if current_date.time() > start_date.time() and current_date.time() < (start_date+datetime.timedelta(seconds=1800)).time():
 			try:
 				dimmer = Dimmer(time_period=1800, start_time=datetime.time(**settings.START_TIME))
+				print 'brightening lights'
+				print dimmer.get_value()
 				brighten_sequence(lights, dimmer)
-				bright_lights_sequence(lights, time_period=1800)
+				print 'lights stay on'
+				print dimmer.get_value()
+				#bright_lights_sequence(lights, time_period=1800)
+				print 'sequence over'
 			except ResetPinException:
 				print "Resetting"
 			lights.cleanup()
+		else:
+			pass
 			
 def main():
 	print 'booting up: %r' %datetime.datetime.now()
