@@ -10,9 +10,6 @@ except:
 import settings
 
 logging.basicConfig(filename='output.log',level=logging.DEBUG)
-logging.debug('This message should go to the log file')
-logging.info('So should this')
-logging.warning('And this, too')
 logging.info('booting up: time is %r', datetime.datetime.now())
 class Dimmer(object):
 	MAX = 255
@@ -53,6 +50,8 @@ class Dimmer(object):
 			return value
 
 class Lights(Adafruit_NeoPixel):
+	MAX_BRIGHTNESS = 255
+	MIN_BRIGHTNESS = 0
 	def __init__(self, n_lights=settings.N_LIGHTS, control_pin=settings.CONTROL_PIN):
 		super(Lights, self).__init__(n_lights, control_pin)
 		self.begin()
@@ -65,6 +64,7 @@ class Lights(Adafruit_NeoPixel):
 		""" Turn off lights """
 		self.setBrightness(0)
 		self.show()
+
 
 def setup_reset():
 	GPIO.setmode(GPIO.BOARD)
@@ -84,6 +84,12 @@ def brighten_sequence(lights, dimmer):
 		lights.show()
 		check_for_reset()
 
+def bright_lights_sequence(lights, time_period=1800):
+	lights.setBrightness(lights.MAX_BRIGHTNESS)
+	lights.show()
+	while datetime.datetime.now().time() < (datetime.datetime.now()+datetime.timedelta(seconds=time_period)).time():
+		check_for_reset()
+
 def main_loop(lights):
 	while True:
 		if datetime.datetime.now().time() < datetime.time(**settings.START_TIME) and datetime.datetime.now().time() > (datetime.datetime.now()+datetime.timedelta(seconds=1800)).time():
@@ -92,6 +98,7 @@ def main_loop(lights):
 			try:
 				dimmer = Dimmer(time_period=1800, start_time=datetime.time(**settings.START_TIME))
 				brighten_sequence(lights, dimmer)
+				bright_lights_sequence(lights, time_period=1800)
 			except ResetPinException:
 				print "Resetting"
 			lights.cleanup()
